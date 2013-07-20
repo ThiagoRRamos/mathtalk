@@ -1,0 +1,139 @@
+<head>
+  <title>Mathtalk</title>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+
+<body>
+  {{> topo}}
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span10 offset1">
+          {{> base}}
+          {{> corpo}}
+        </div>
+      </div>
+    </div>
+</body>
+
+<template name="topo">
+  {{loginButtons}}
+  {{#if dentrodesala}}
+  <a id="sair-sala" href="#" class="pull-right">Sair da sala</a>
+  {{/if}}
+  <div class="horizontal-divider"></div>
+</template>
+
+<template name="corpo">
+	{{#if dentrodesala}}
+		{{> sala}}
+	{{/if}}
+	{{#if foradesala}}
+  		{{> entrada}}
+  	{{/if}}
+</template>
+
+<template name="base">
+</template>
+
+<template name="entrada">
+  <div class="hero-unit">
+    <h1>MathTalk</h1>
+    <p>Porque conversar sobre matemática na internet dá muito trabalho!</p>
+    {{#if currentUser}}
+      <p>
+      <a href="#" id="criar-sala">Crie uma nova sala</a> ou entre em uma existente:
+      </p>
+      <div class="input-append">
+        <input placeholder="Codigo da Sala" id="codigo-sala" type="text"/>
+        <button class="btn" type="button" id="entrar-sala">Enviar</button>
+      </div>
+    {{else}}
+      <p>Faça login para entrar</p>
+    {{/if}}
+    <br/>
+    <!-- Button to trigger modal -->
+    <a href="#myModal" role="button" class="btn btn-info" data-toggle="modal">Saiba mais</a>
+  </div>
+	<!-- Modal -->
+  <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">MathTalk!</h3>
+    </div>
+    <div class="modal-body">
+    <p>Quem já teve que ajudar alguém a resolver um problema de matemática via internet sabe: Não dá para escrever com a mesma naturalidade com que você escreveria em um papel.</p>
+    <p>Escrever equações, fazer expoentes, simbolizar integrais, hnnf... até suas variáveis tem que mudar, porque seu \(\alpha\) vira a, mas você quer usar o a depois.</p>
+    <p>Você até pode escrever na mão e enviar fotos (acredite, eu já tentei), mas fica totalmente imprático fazer isso quando você tem que mandar mais de duas fotos.</p>
+    <p> A não ser que você elabore um padrão prévio de escrita, não dá para fazer o que você quer. E mesmo com o padrão, a leitura dos elementos fica longe do desejado.</p>
+    <p>Foi para isso que fizemos o Mathtalk. Nele você pode escrever suas expressões mais facilmente, lê-las mais facilmente e ainda, se precisar, ter toda a flexibilidade do <a href="http://en.wikibooks.org/wiki/LaTeX/Mathematics">LaTeX</a> para equações matemáticas </p>
+    <p>Assim, os comandos para você escrever sua equação ficam bem mais simples, e são sempre renderizados para formar uma visualização adequada</p>
+    <p>Esperamos que o MathTalk lhe seja útil e resolva esses problemas que sempre tivemos com matemática online</p>
+    <p>\[\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)\]</p>
+    </div>
+    <div class="modal-footer">
+    <button class="btn btn-info" data-dismiss="modal" aria-hidden="true">Entendi</button>
+    </div>
+  </div>
+</template>
+
+<template name="sala">
+  <div id="cabecalho" class="span12">
+    <dl>
+      <div class="span4">
+        <dt>Codigo</dt>
+        <dd>{{codigo}}</dd>
+      </div>
+      <div class="span4">
+        <dt>Membros</dt>
+        <dd>
+          <ul>
+            {{#each membros}}
+              <li>{{username}}</li>
+            {{/each}}
+          </ul>
+        </dd>  
+      </div>
+    </dl>
+  </div>
+  <div id="mensagens" class="span12">
+    <ul>
+    {{#each messages}}
+      <li>{{> messagebody}}</li>
+    {{/each}}
+    </ul>
+  </div>
+  {{> painel}}
+</template>
+
+<template name="painel">
+  <div id="botoes" class="span12" style="height: 5px;font-size: 0px;">
+    <img id="button-inline-math" class="botao" src="/buttons/Button_int_link.png"/>
+    <img id="button-math" class="botao" src="/buttons/Button_int_link.png"/>
+    <span class="divider"></span>
+    <img id="button-integral" class="botao" src="/buttons/Button_integral.png"/>
+    <img id="button-fraction" class="botao" src="/buttons/Button_fraction.png"/>
+    <img id="button-limit" class="botao" src="/buttons/Button_lim.png"/>
+    <span class="divider"></span>
+    <img id="button-sum" class="botao" src="/buttons/Button_sigma.png"/>
+    <img id="button-sqrt" class="botao" src="/buttons/Button_sqrt.png"/>
+    <span class="divider"></span>
+    <img id="button-alpha" class="botao" src="/buttons/Button_alpha.png"/>
+    <img id="button-beta" class="botao" src="/buttons/Button_beta.png"/>
+    <img id="button-theta" class="botao" src="/buttons/Button_theta.png"/>
+  </div>
+  <div id="entrada-de-mensagens" class="span12">
+    <textarea id="mensagem-enviar" class="span10 pull-left" style="height: 100px; float: left;"/>
+    <div class="span2">
+      <div class="btn-group btn-block btn-group-vertical">
+        <button type="button" id="mode-enter" class="btn btn-primary btn-block {{enterModeActivated}}">Modo Enter</button>
+        <button type="button" id="mode-math" class="btn btn-primary btn-block {{mathModeActivated}}">Modo Math</button>
+      </div>
+      <button id="enviar-mensagem" class="btn btn-success btn-block">Enviar</button>
+    </div>
+  </div>
+</template>
+
+<template name="messagebody">
+  <p class="cinza">{{sender}} disse:</p>
+  <p>{{body}}</p>
+</template>
