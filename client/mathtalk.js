@@ -18,6 +18,10 @@
   }
 }
 
+function colocarNoTextArea(tagstart, middle, tagend){
+  formatText(document.getElementById("mensagem-enviar"), tagstart, middle, tagend)
+}
+
 function criarNovaSala(){
   return Salas.insert({});
 }
@@ -52,14 +56,9 @@ function mandarMensagemDigitada(){
 
 }
 
-Meteor.startup(function(){
-  Session.set("math-mode", false)
-  Session.set("enter-mode", false)
-})
-
-Meteor.setInterval(function(){
-  
-},1000)
+/* =========================================================
+  Template events
+  ==========================================================*/
 
 Template.corpo.events({
   'click #criar-sala' : function () {
@@ -71,10 +70,6 @@ Template.corpo.events({
     entrarSala(sala_id);
   }
 });
-
-Template.topo.dentrodesala = function(){
-  return Meteor.user() && salaAtual();
-}
 
 Template.topo.events({
   'click #sair-sala': function(){
@@ -94,47 +89,57 @@ Template.sala.events({
   },
   'click #mode-enter': function(){
     Session.set("enter-mode",!Session.get("enter-mode"))
-    $("#mode-enter").button("toggle")
   },
   'click #mode-math': function(){
     Session.set("math-mode",!Session.get("math-mode"))
-    $("#mode-math").button("toggle")
   },
   'click #button-inline-math': function(){
-    formatText(document.getElementById("mensagem-enviar"), "\\(","expressao","\\)");
+    colocarNoTextArea("\\(","expressao","\\)");
   },
   'click #button-math': function(){
-    formatText(document.getElementById("mensagem-enviar"), "\\[","expressao","\\]");
+    colocarNoTextArea( "\\[","expressao","\\]");
   },
   'click #button-integral': function(){
-    formatText(document.getElementById("mensagem-enviar"), "\\int_{inicio}^{fim} \\!","f(x)","\\, dx");
+    colocarNoTextArea( "\\int_{inicio}^{fim} \\!","f(x)","\\, dx");
   },
   'click #button-fraction': function(){
-    formatText(document.getElementById("mensagem-enviar"), "\\frac{","x","}{y}");
+    colocarNoTextArea( "\\frac{","x","}{y}");
   },
   'click #button-alpha': function(){
-    formatText(document.getElementById("mensagem-enviar"),"", "","\\alpha");
+    colocarNoTextArea("", "","\\alpha");
   },
   'click #button-theta': function(){
-    formatText(document.getElementById("mensagem-enviar"),"","", "\\theta");
+    colocarNoTextArea("","", "\\theta");
   },
   'click #button-sum': function(){
-    formatText(document.getElementById("mensagem-enviar"),"\\sum_{inicio}^{fim}", "a_n", "");
+    colocarNoTextArea("\\sum_{inicio}^{fim}", "a_n", "");
   },
   'click #button-sqrt': function(){
-    formatText(document.getElementById("mensagem-enviar"),"\\sqrt{", "n", "}");
+    colocarNoTextArea("\\sqrt{", "n", "}");
   },
   'click #button-beta': function(){
-    formatText(document.getElementById("mensagem-enviar"),"", "\\beta", "");
+    colocarNoTextArea("", "\\beta", "");
   },
   'click #button-limit': function(){
-    formatText(document.getElementById("mensagem-enviar"),"\\lim_{x \\to \\infty}", "f(x)", "");
+    colocarNoTextArea("\\lim_{x \\to \\infty}", "f(x)", "");
   }
 })
+
+/* =========================================================
+  Template hooks
+  ==========================================================*/
 
 Template.sala.rendered = function() {
   var el = document.getElementById("mensagens")
   MathJax.Hub.Queue(["Typeset",MathJax.Hub, el]);
+}
+
+/* =========================================================
+  Template variables
+  ==========================================================*/
+
+Template.topo.dentrodesala = function(){
+  return Meteor.user() && salaAtual();
 }
 
 Template.corpo.dentrodesala = function(){
@@ -165,24 +170,10 @@ Template.painel.mathModeActivated = function(){
   return Session.get("math-mode") ? "active" : "";
 }
 
-Accounts.ui.config({
-  passwordSignupFields: 'USERNAME_AND_OPTIONAL_EMAIL'
-});
+/* =========================================================
+  Routing
+  ==========================================================*/
 
 page("/sala/:id", function(ctx){
-  console.log(ctx.params.id)
   entrarSala(ctx.params.id)
-})
-
-Meteor.autorun(function() {
-  console.log("atualizando")
-  var salaAtual = Session.get("salaAtual");
-  if (Meteor.userId() && salaAtual) {
-      Salas.update({"_id": salaAtual},{$push:{"members": Meteor.user()}})
-    }
-});
-
-Meteor.autorun(function(){
-  var messages = Salas.findOne(Session.get("salaAtual"))
-  console.log("AAAAAAAAAAAAAAAAAAAA")
 })
